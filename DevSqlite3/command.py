@@ -1,6 +1,6 @@
 # command
-from error import *
-from field import Field
+from .error import *
+from .field import Field
 
 
 class DatabaseCommand:
