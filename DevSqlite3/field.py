@@ -1,5 +1,5 @@
 # field
-from error import *
+from .error import *
 
 
 class Field:
