@@ -1,180 +1,177 @@
-# PySqlite3 Helper
-A Python package to create sqlite3 database and get data and insert data with python classes, you can also using Sqlite3 commands!
-
-
-# Why PySqlite3 helper?
-It is an easy-to-use and fastest library, where it can maintain its connection with Sqlite3 database while working
+# DevSqlite3
+A python package to create sqlite3 database with python class.
 
 ## install by PyPI:
 
 ```
-pip3 install DevSqlite3==0.0.1
+pip3 install DevSqlite3
 or
-python -m pip install DevSqlite3==0.0.1
+python -m pip install DevSqlite3
 ```
 
-## Usage
-
-first create python file called tables.py or some other name
-
+if you have old version:
 ```
-# class name is your table name
-class Users:
-	# this is your table indexes, you must add self.id = "text" for work without any error
-	def __init__(self):
-		# default index
-		self.id = "text"
-		# add indexes to your table
-		self.username = "text"
-		self.password = "text"
-		self.first_name = "text"
-		self.last_name = "text"
-		# etc...
-
-# you can create other class for other database in this file
-
+pip3 install --upgrade DevSqlite3
+python -m pip install --upgrade DevSqlite3
 ```
 
-build sqlite database in your main project
+## setup sqlite3 database
+
+Note: You can add field and remove it from your class, it's will automatically removed or added from sqlite3 database
+
+also you can use:
+
+1- dropColumnNotExists=False or True # default True
+2- addColumnNotExists=False or True # default True
+
+that's mean when your remove some fields from your class, it's will removed from database table also when adding fields to your class, it's will added to database
+
+to use:
+```
+@Database('DatabaseFileName', path='folderName', dropColumnNotExists=False, addColumnNotExists=False)
+```
+
+Note: path, dropColumnNotExists, addColumnNotExists is not requires.
+
+create sqlite3 database:
 
 ```
-from DevSqlite3.DevDB import Database, DatabaseBuilder
+from DevSqlite3.core import Database, Table
 
-from table import * # table is your table.py python file 
 
-@Database
-class YourUsersDatabaseName(DatabaseBuilder):
-	def __init__(self):
-		super().__init__(self)
+@Database('DatabaseFileName', path='folderName')
+class Users(Table):
+	id = Table.integerField(primary=True, null=False) # id integer primary key not null
+	username = Table.stringField() # username text, if you want to add not null Table.stringField(null=False)
+	password = Table.stringField()
+	join_time = Table.dateField()
+	nicks = Table.listField()
+	owned_item = table.dictField()
+	# if you want to ignore column, make variable name starts with __, for example
+	__ignore__ = "any"
 	
-	@staticmethod
-	def __superclass__():
-		return Users # this is your Users class on table.py python file
-
-# database was successfully created!!
-
 ```
 
-now some examples:
+you can also add custom function like Dao in room database:
 
 ```
-# insert data to database
-
-user = Users()
-user.id = 0 # don't use it because it will change automatically to INTEGER PRIMARY KEY
-user.username = "omar.othman"
-user.password = "******"
-user.first_name = "Omar"
-user.last_name = "Othman"
-
-db = YourUsersDatabaseName()
-db.insert(user)
-
-# get data from database
-db = YourUsersDatabaseName()
-result = db.select(Users).where("username").equals("omar.othman").get_first()
-if result:
-	print("hey i found him:\nFirstName: {}\nLastName: {}\nPassword: {}".format(result.first_name, result.last_name, result.password))
-else:
-	print("Oh sorry not found")
-
-# get all users name equals omar.othman
-result = db.select(Users).where("username").equals("omar.othman").get_all() # result as array
-if result:
-	print("got some users")
-	for user in result:
-		print("FirstName: {}\nLastName: {}\nPassword: {}".format(user.first_name, user.last_name, user.password))
-else:
-	print("Oh sorry not found")
+@Database('DatabaseFileName', path='folderName')
+class Users(Table):
+	id = Table.integerField(primary=True, null=False) # id integer primary key not null
+	username = Table.stringField() # username text, if you want to add not null Table.stringField(null=False)
+	password = Table.stringField()
+	join_time = Table.dateField()
+	nicks = Table.listField()
+	owned_item = table.dictField()
 	
-# update result
-if result:
-	result.password = "1234"
-	db.update(result) # update if exists
-	# you can use also db.insertOrUpdate(result), that's mean delete if exists and insert
+	def getUsers(self):
+        return self.execute("select * from User").all()  # return list of class Users if detected else empty list
 
-# delete result:
-if result:
-	db.delete(result)
+    def getUserById(self, i):
+        return self.execute("select * from User where id=:id",
+                            args={"id": i}).first()  # return Users class if detected else None
 
+    def updatePassword(self, username, password):
+        return self.execute("update User set password=:password where username=:username",
+                            args={"username": username, "password": password}).run()  # return None if update or last row id if insert
+```
 
-# start with sqlite3 commands
-db = YourUsersDatabaseName()
-db.select(Users).query("update __table__ set password='1234' where username='omar.othman'") # use __table__ for table name
+## getting data from database
+```
+u = Users()
+users = u.getUsers()
+for user in users:
+	print(user.id, user.username, user.join_time)
+	
+	# update all
+	
+	user.password = "123"
+	user.save()
 
+user = u.getUserById(1)
+if user:
+	# delete
+	user.delete()
+	
+	# or update
+	user.password = "123"
+	user.nicks = ["1", "2", "3"]
+	user.owned_item = {"colors": ["red", "white", "etc"]}
+	user.save()
+```
 
-# or get result as superclass array
-result = db.select(Users).query("select * from __table__ where etc.. or just select * from __table__") # result will be empty array if empty or array of Users
-if result:
-	for user in result:
-		print(user.username)
+## insert data to database
+```
+from datetime import datetime
 
-# is not finish there is more examples XD
-
-db = YourUsersDatabaseName()
-result = db.select(Users).get_all()
-# or
-result = db.select(Users).order_by("variable_name", stuff="desc", limit=10).get_all() # stuff defult is asc and limit 0 is means all of data
-# or
-result = db.select(Users).where("first_name").like("Omar").order_by("username").get_all()
-# or
-result = db.select(Users).where("first_name).like("Omar").or_where("last_name").like("Othman").get_all()
-# or
-result = db.select(Users).where("first_name").like("Omar").and_where("last_name").like("Othman").get_all()
-
-# or
-result = db.select(Users).where("username").equals("omar.othman").and_where("password").equals("123").get_first()
-
-
-
-
-# you can also insert list or dict or int or str in class varablie examples
-
-user = Users()
-user.username = "omar.othman"
-user.password = "12345"
-user.first_name = ["Omar", "other", "other..."]
-user.last_name = {"key": "value"}
-db = YourUsersDatabaseName()
-db.insert(user)
-# and you will got result as list or dict
-db = YourUsersDatabaseName()
-result = db.select(Users).where("username").equals("omar.othman").get_first()
-if result:
-	for item in result.first_name:
-		print(item)
-	for key in result.last_name:
-		print("Key: {}, Value: {}".format(key, result.last_name[key]))
-# etc......
+u = Users()
+u.username = "omar.othman"
+u.password = "password"
+u.join_time = datetime.now()
+u.save()
 
 ```
 
-## Database Select class functions
+## are you noob with sqlite commands? don't worry we can help you
+```
+u = Users()
+find = u.where('username').equals('omar.othman').andWhere('password').equals('password').first() # select * from Users where username='omar.othman' and password='password'
+if find:
+	find.password = "newPassword"
+	find.save() # update
+else:
+	u.username = "omar.othman"
+	u.password = "newPassword"
+	u.save() # insert
+```
 
-Function name | paramerts
------------- | -------------
-where | class_variable_name
-or_where | class_variable_name
-and_where | class_variable_name
-equals | string, integar
-get_first | get the first result from sqlite3 database as python class or None if not found
-get_all | get all result from sqlite3 database as array of python class or empty array if not found
-query | sqlite3 comnmands use __table__ instand of table_name, return empty array if there no result, or array of class
+# aslo you can add more tables to database
 
-## Database functions
+```
+@Database('DatabaseFileName', path='folderName') # The database file name must be the same as the other name, or a new one will be created
+class AnotherTableName(Table):
+	# etc ...
+```
 
-Function Name | Parameter
------------- | -------------
-insert | python class
-insertOrUpdate | python class
-delete | python class
-update | python class
-Select | python class
+## about where
+
+functions | paramerets | about
+----------- ----------- | -----------
+orWhere | column name | sqlite 'or'
+andWhere | column name | sqlite 'and'
+equals | value | where column row equals value
+notEquals | value | where column row not equals value
+like | value, before=True, after=True | where column row like value, before it's mean %value and after value% when before and after is True: %value%
+notLike | value, before=True, after=True | where column row not like value, before it's mean %value and after value% when before and after is True: %value%
+orderBy | column name, stuff="asc", limit=0 | sort by column name, stuff can be "asc" or "desc", limit 0 is unlimited
+all | empty | to get list of class or empty list if not found
+first | empty | to get first result as class or None if not found
+run | empty | sent your sql command to database if command is insert will return lastrowid else return None
 
 
-# that's was all
+## python version requires >=2
 
-Thank you if you want to support me https://paypal.me/nxdev 
+
+## about me
+Name: Omar Othman
+Birth: 05.01.1995 / DD.MM.YYYY
+Mother country: Syria
+Live: Germany
+
+Donate: https://paypal.me/nxdev
+
+
+# update info
+1- remove __superclass__ from custom class table
+2- change 'get_all' to 'all'
+3- change 'get_first' to 'first'
+4- added 'run' function
+
+
+# next update?
+* support MySql database!!!
+
+
 
 
 
