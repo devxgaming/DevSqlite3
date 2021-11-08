@@ -2,10 +2,10 @@
 
 import sqlite3
 import os
-from error import *
+from .error import *
 from typing import Callable
-from command import DatabaseCommand, Type
-from field import Field
+from .command import DatabaseCommand, Type
+from .field import Field
 import datetime
 
 CONNECTION = {"databases": {}}
