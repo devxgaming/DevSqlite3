@@ -21,8 +21,8 @@ Note: You can add field and remove it from your class, it's will automatically r
 
 also you can use:
 
-1- dropColumnNotExists=False or True # default True
-2- addColumnNotExists=False or True # default True
+* dropColumnNotExists=False or True # default True
+* addColumnNotExists=False or True # default True
 
 that's mean when your remove some fields from your class, it's will removed from database table also when adding fields to your class, it's will added to database
 
