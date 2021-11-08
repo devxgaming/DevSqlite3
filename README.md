@@ -139,10 +139,10 @@ class AnotherTableName(Table):
 
 
 # update info
-1- remove __superclass__ from custom class table
-2- change 'get_all' to 'all'
-3- change 'get_first' to 'first'
-4- added 'run' function
+* remove __superclass__ from custom class table
+* change 'get_all' to 'all'
+* change 'get_first' to 'first'
+* added 'run' function
 
 
 # next update?
