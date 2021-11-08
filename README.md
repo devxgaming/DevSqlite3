@@ -133,32 +133,9 @@ class AnotherTableName(Table):
 	# etc ...
 ```
 
-## about where
-
-functions | paramerets | about
------------ ----------- | -----------
-orWhere | column name | sqlite 'or'
-andWhere | column name | sqlite 'and'
-equals | value | where column row equals value
-notEquals | value | where column row not equals value
-like | value, before=True, after=True | where column row like value, before it's mean %value and after value% when before and after is True: %value%
-notLike | value, before=True, after=True | where column row not like value, before it's mean %value and after value% when before and after is True: %value%
-orderBy | column name, stuff="asc", limit=0 | sort by column name, stuff can be "asc" or "desc", limit 0 is unlimited
-all | empty | to get list of class or empty list if not found
-first | empty | to get first result as class or None if not found
-run | empty | sent your sql command to database if command is insert will return lastrowid else return None
 
 
 ## python version requires >=2
-
-
-## about me
-Name: Omar Othman
-Birth: 05.01.1995 / DD.MM.YYYY
-Mother country: Syria
-Live: Germany
-
-Donate: https://paypal.me/nxdev
 
 
 # update info
@@ -170,6 +147,9 @@ Donate: https://paypal.me/nxdev
 
 # next update?
 * support MySql database!!!
+
+
+Donate: https://paypal.me/nxdev
 
 
 
