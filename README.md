@@ -64,7 +64,7 @@ class Users(Table):
 	nicks = Table.listField()
 	owned_item = table.dictField()
 	
-	def getUsers(self):
+    def getUsers(self):
         return self.execute("select * from User").all()  # return list of class Users if detected else empty list
 
     def getUserById(self, i):
